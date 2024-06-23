@@ -92,7 +92,6 @@ public class BD {
                 e.printStackTrace();
             }
         }
-        // Se não encontrou o cliente, retorna null
         return null;
     }
 
@@ -119,23 +118,18 @@ public class BD {
 
 
     public static void lerEAtualizarCliente(String cpfSearch, String newNIV) {
-        // File path
         String filePath = "src/dbClientes.txt";
-        // List to hold Cliente objects
         List<Cliente> clientes = new ArrayList<>();
 
-        // Read the file and populate the list
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // Parse each line to extract Cliente information
                 String cpf = extrairValor(line, "cpf:");
                 String nome = extrairValor(line, "nome:");
                 boolean carteiraDeMotorista = Boolean.parseBoolean(extrairValor(line, "carteiraDeMotorista:"));
                 String NIV = extrairValor(line, "NIV:");
                 double saldo = Double.parseDouble(extrairValor(line, "saldo:"));
 
-                // Create Cliente object and add to list
                 Cliente cliente = new Cliente(cpf, nome, carteiraDeMotorista, saldo, NIV);
                 clientes.add(cliente);
             }
@@ -154,14 +148,11 @@ public class BD {
             }
         }
 
-        // If CPF not found, add a new entry
         if (!found) {
-            // Assuming other fields are null or default values
             Cliente newCliente = new Cliente(cpfSearch, null, false, 0.0, newNIV);
             clientes.add(newCliente);
         }
 
-        // Write the updated list back to the file
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Cliente cliente : clientes) {
                 writer.write(cliente.toString());
@@ -172,19 +163,12 @@ public class BD {
         }
     }
 
-    // Helper method to extract value between key and next comma
     private static String extrairValor(String line, String key) {
         int startIndex = line.indexOf(key) + key.length();
         int endIndex = line.indexOf(",", startIndex);
         if (endIndex == -1) {
             endIndex = line.length() - 1;
         }
-        System.out.println("-----");
-        System.out.println(line);
-        System.out.println(key);
-        System.out.println(startIndex);
-        System.out.println(endIndex);
-        System.out.println("-----");
         return line.substring(startIndex, endIndex).trim();
     }
 
