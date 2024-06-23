@@ -1,0 +1,20 @@
+[
+  {
+    "marca": "fiat",
+    "modelo": "uno mille",
+    "ano": 1997,
+    "precoFipe": 9542
+  },
+  {
+    "marca": "fiat",
+    "modelo": "strada",
+    "ano": 2003,
+    "precoFipe": 16926
+  },
+  {
+    "marca": "bmw",
+    "modelo": "x6",
+    "ano": 2011,
+    "precoFipe": 114724
+  }
+]
