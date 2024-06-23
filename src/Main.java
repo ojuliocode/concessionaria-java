@@ -11,8 +11,6 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
-
-
         String arquivoJson = "src/tabela-fipe.json";
         List<Veiculo> veiculosTabelaFipe = lerCarrosDeJson(arquivoJson);
         Concessionaria concessionariaDoBraian = new Concessionaria(veiculosTabelaFipe, 2000, "do Braian");
@@ -26,25 +24,46 @@ public class Main {
 
         int opcao = 0;
 
-        while(opcao != 4){
 
             System.out.println("Bem vindo à concessionaria " + concessionariaDoBraian.getNome() + " !!!");
+            System.out.println("Qual seu cpf??");
+            String cpf = scanner.nextLine();
+            Cliente cliente1 = BD.buscarClientePorCPF(cpf);
+
+            if(cliente1 == null){
+                cliente1 = new Cliente();
+                //criando cadastro do cliente
+                System.out.println("Informe seus nome plis");
+                cliente1.setNome(scanner.nextLine());
+                System.out.println("Informe seus dinheiro plis");
+                cliente1.setSaldo(scanner.nextDouble());
+                System.out.println("Tem carteira? (true ou false)");
+                cliente1.setCarteiraDeMotorista(scanner.nextBoolean());
+
+                cliente1.setCpf(cpf);
+                String formatada = BD.formatarPraSalvarClienteNoBD(cliente1);
+                BD.salvarNoBD("src/dbClientes.txt", formatada);
+            }
+        System.out.println(cliente1.getNome());
+        System.out.println(cliente1.temCarteira());
+
+        while(opcao != 2){
+
             System.out.println("O que deseja hoje?");
             System.out.println("1: Comprar um veiculo");
-            System.out.println("2: Alugar um veiculo");
-            System.out.println("3: So dar uma olhadinha");
-            System.out.println("4: Sair");
+            System.out.println("2: Sair");
 
             opcao = scanner.nextInt();
 
             switch (opcao){
                 case 1:
-                    comprarVeiculo(scanner, cliente, concessionariaDoBraian);
+                    comprarVeiculo(scanner, cliente1, concessionariaDoBraian);
                     break;
-
             }
+
         }
 
+        scanner.close();
 
     }
 

@@ -46,7 +46,8 @@ public class Cliente {
         String dbDeClientes = "src/dbClientes.txt";
         String dbDeCarros = "src/dbCarros.txt";
 
-        BD.salvarNoBD(dbDeClientes, "{cpfCliente:" + this.cpf +"," + "carro:" + lista.get(indiceDoVeiculo).getNIV() + "}\n");
+
+        BD.salvarNoBD(dbDeClientes,BD.formatarPraSalvarClienteNoBD(this, lista.get(indiceDoVeiculo).getNIV()));
         System.out.println("Carro comprado com sucesso! ");
     }
 
@@ -96,5 +97,17 @@ public class Cliente {
         this.nome = nome;
         this.carteiraDeMotorista = carteiraDeMotorista;
         this.saldo = saldo;
+    }
+
+    public Cliente(String cpf, String nome, boolean carteiraDeMotorista, double saldo, String NIV) {
+        this.cpf = cpf;
+        this.nome = nome;
+        this.carteiraDeMotorista = carteiraDeMotorista;
+        this.saldo = saldo;
+        this.NIV = NIV;
+    }
+
+    public Cliente(){
+
     }
 }
