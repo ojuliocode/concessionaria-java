@@ -10,6 +10,9 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+
+
+
         String arquivoJson = "src/tabela-fipe.json";
         List<Veiculo> veiculosTabelaFipe = lerCarrosDeJson(arquivoJson);
         Concessionaria concessionariaDoBraian = new Concessionaria(veiculosTabelaFipe, 2000, "do Braian");
@@ -41,6 +44,8 @@ public class Main {
 
             }
         }
+
+
     }
 
     public static void comprarVeiculo(Scanner scanner, Cliente cliente, Concessionaria concessionaria){
@@ -53,7 +58,11 @@ public class Main {
         switch (opcao){
             case 1:
                 int indiceDoVeiculo = scanner.nextInt();
-                cliente.comprarVeiculo(indiceDoVeiculo, concessionaria);
+                try{
+                    cliente.comprarVeiculo(indiceDoVeiculo, concessionaria);
+                }catch (SaldoInsuficienteException | VeiculoIndisponivelException | NaoTemCNHException e ){
+                    System.out.println(e.getMessage());
+                }
                 break;
             case 2:
                 cliente.verOpcoes(concessionaria, scanner);
@@ -104,6 +113,9 @@ public class Main {
                                 break;
                             case "precoFipe":
                                 veiculo.setPrecoFipe(Integer.parseInt(value));
+                                break;
+                            case "NIV":
+                                veiculo.setNIV(value);
                                 break;
                             default:
                                 break;

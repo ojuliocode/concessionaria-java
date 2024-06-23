@@ -15,23 +15,39 @@ public class Cliente {
         }
         System.out.println("Qual veiculo deseja comprar?");
         int indiceVeiculo = scanner.nextInt();
-        comprarVeiculo(indiceVeiculo, concessionaria);
+
+        try {
+            comprarVeiculo(indiceVeiculo, concessionaria);
+        }catch (VeiculoIndisponivelException | SaldoInsuficienteException | NaoTemCNHException e){
+            System.out.println(e.getMessage());
+        }
     }
 
 
-    public boolean comprarVeiculo(int indiceDoVeiculo, Concessionaria concessionaria){
+    public void comprarVeiculo(int indiceDoVeiculo, Concessionaria concessionaria) throws NaoTemCNHException {
         List<Veiculo> lista = concessionaria.getVeiculosDisponiveis();
 
+
         if(lista.size() < indiceDoVeiculo){
-            if(this.getSaldo() >= lista.get(indiceDoVeiculo).getPreco()){
-                if(this.temCarteira() == true){
-                    lista.get(indiceDoVeiculo).setCpfDoDono(this.getCpf());
-                    this.setSaldo(this.getSaldo() - lista.get(indiceDoVeiculo).getPreco());
-                    return true;
-                }
-            }
+            throw  new VeiculoIndisponivelException("Não há veículos com esse índice");
         }
-        return false;
+        if(this.getSaldo() < lista.get(indiceDoVeiculo).getPreco()){
+            throw new SaldoInsuficienteException("Saldo insuficiente pra operação");
+        }
+
+        if(this.temCarteira() == false){
+            throw new NaoTemCNHException("Não tem carteira de habilitação");
+        }
+
+        lista.get(indiceDoVeiculo).setCpfDoDono(this.getCpf());
+        this.setSaldo(this.getSaldo() - lista.get(indiceDoVeiculo).getPreco());
+        this.setNIV(lista.get(indiceDoVeiculo).getNIV());
+
+        String dbDeClientes = "src/dbClientes.txt";
+        String dbDeCarros = "src/dbCarros.txt";
+
+        BD.salvarNoBD(dbDeClientes, "{cpfCliente:" + this.cpf +"," + "carro:" + lista.get(indiceDoVeiculo).getNIV() + "}\n");
+        System.out.println("Carro comprado com sucesso! ");
     }
 
 

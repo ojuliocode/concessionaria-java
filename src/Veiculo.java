@@ -6,7 +6,15 @@ public abstract class Veiculo {
     private boolean ipvaPago;
     private String cpfDoDono = null;
     private double preco;
+    private String NIV;
 
+    public String getNIV() {
+        return NIV;
+    }
+
+    public void setNIV(String NIV) {
+        this.NIV = NIV;
+    }
 
     public int getPrecoFipe() {
         return precoFipe;
