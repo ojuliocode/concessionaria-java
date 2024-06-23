@@ -2,6 +2,11 @@ public abstract class Veiculo {
     private String marca;
     private String modelo;
     private int ano;
+    private int precoFipe; // Preco na tabela Fipe não tem centavos
+    private boolean ipvaPago;
+    private String cpfDoDono = null;
+    private double preco;
+
 
     public int getPrecoFipe() {
         return precoFipe;
@@ -59,9 +64,5 @@ public abstract class Veiculo {
         this.preco = preco;
     }
 
-    private int precoFipe; // Preco na tabela Fipe não tem centavos
-    private boolean ipvaPago;
-    private String cpfDoDono = null;
-    private double preco;
 
 }
