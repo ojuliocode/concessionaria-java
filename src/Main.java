@@ -9,16 +9,17 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         String arquivoJson = "src/tabela-fipe.json";
+        List<Veiculo> veiculosTabelaFipe = lerCarrosDeJson(arquivoJson);
+        Concessionaria concessionariaDoBraian = new Concessionaria(veiculosTabelaFipe, 2000);
+        Cliente cliente = new Cliente("1234567", "Vandão", true);
 
-        List<Carro> carrosTabelaFipe = lerCarrosDeJson(arquivoJson);
-
-        for (Carro carro : carrosTabelaFipe) {
-            System.out.println(carro.toString());
+        for (Veiculo veiculo : concessionariaDoBraian.getVeiculosDisponiveis()) {
+            veiculo.setPreco(veiculo.getPrecoFipe() + concessionariaDoBraian.getCompensacaoPrecoVenda());
         }
     }
 
-    public static List<Carro> lerCarrosDeJson(String arquivoJson) {
-        List<Carro> carros = new ArrayList<>();
+    public static List<Veiculo> lerCarrosDeJson(String arquivoJson) {
+        List<Veiculo> veiculos = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(arquivoJson))) {
             String line;
@@ -42,29 +43,29 @@ public class Main {
                     }
 
                     String[] fields = obj.split(",");
-                    Carro carro = new Carro();
+                    Carro veiculo = new Carro();
                     for (String field : fields) {
                         String[] keyValue = field.split(":");
                         String key = keyValue[0].replaceAll("\"", "").trim();
                         String value = keyValue[1].replaceAll("\"", "").trim();
                         switch (key) {
                             case "marca":
-                                carro.setMarca(value);
+                                veiculo.setMarca(value);
                                 break;
                             case "modelo":
-                                carro.setModelo(value);
+                                veiculo.setModelo(value);
                                 break;
                             case "ano":
-                                carro.setAno(Integer.parseInt(value));
+                                veiculo.setAno(Integer.parseInt(value));
                                 break;
                             case "precoFipe":
-                                carro.setPrecoFipe(Integer.parseInt(value));
+                                veiculo.setPrecoFipe(Integer.parseInt(value));
                                 break;
                             default:
                                 break;
                         }
                     }
-                    carros.add(carro);
+                    veiculos.add(veiculo);
                 }
             }
 
@@ -72,7 +73,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        return carros;
+        return veiculos;
     }
 
 
