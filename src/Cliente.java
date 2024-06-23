@@ -19,13 +19,15 @@ public class Cliente {
 
         try {
             comprarVeiculo(indiceVeiculo, concessionaria);
-        }catch (VeiculoIndisponivelException | SaldoInsuficienteException | NaoTemCNHException e){
+        }catch (VeiculoIndisponivelException | SaldoInsuficienteException | NaoTemCNHException | AlguemJaTemEsseCarroException e){
             System.out.println(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
 
-    public void comprarVeiculo(int indiceDoVeiculo, Concessionaria concessionaria) throws NaoTemCNHException {
+    public void comprarVeiculo(int indiceDoVeiculo, Concessionaria concessionaria) throws Exception {
         List<Veiculo> lista = concessionaria.getVeiculosDisponiveis();
 
 
@@ -40,14 +42,19 @@ public class Cliente {
             throw new NaoTemCNHException("Não tem carteira de habilitação");
         }
 
+        // Verifica se o veículo já possui um dono
+        String dbDeClientes = "src/dbClientes.txt";
+        boolean clienteExistente = BD.existeNIVNoDB("src/dbClientes.txt", lista.get(indiceDoVeiculo).getNIV());
+        if (clienteExistente == true) {
+            throw new AlguemJaTemEsseCarroException("O veículo já possui um dono.");
+        }
+
         lista.get(indiceDoVeiculo).setCpfDoDono(this.getCpf());
         this.setSaldo(this.getSaldo() - lista.get(indiceDoVeiculo).getPreco());
         this.setNIV(lista.get(indiceDoVeiculo).getNIV());
 
-        String dbDeClientes = "src/dbClientes.txt";
-
         try {
-            BD.modificarNIVPorCPF(dbDeClientes, this.cpf, lista.get(indiceDoVeiculo).getNIV());
+            BD.modificarNoDB(dbDeClientes, this.cpf, lista.get(indiceDoVeiculo).getNIV(), this.saldo);
         }catch (IOException e) {
             System.err.println("Erro ao modificar o NIV: " + e.getMessage());
         }

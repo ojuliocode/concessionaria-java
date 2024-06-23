@@ -29,7 +29,7 @@ public class BD {
         abrirArquivo(arquivo);
         try {
             Path path = Path.of(arquivo);
-            Files.write(path, info.getBytes(), StandardOpenOption.WRITE);
+            Files.write(path, info.getBytes(), StandardOpenOption.APPEND);
 
         }catch (IOException e){
             System.out.println(e.getMessage());
@@ -120,16 +120,22 @@ public class BD {
         return cpfFormatado + niv + nome + carteiraDeMotorista + saldo;
     }
 
-    public static void modificarNIVPorCPF(String caminhoArquivo, String cpfProcurado, String novoNIV) throws IOException {
+    public static void modificarNoDB(String caminhoArquivo, String cpfProcurado, String novoNIV, double novoSaldo) throws IOException {
         List<String> linhas = lerLinhasDoArquivo(caminhoArquivo);
         StringBuilder novoConteudo = new StringBuilder();
 
         for (String linha : linhas) {
             if (linha.contains("cpf:") && linha.substring(linha.indexOf("cpf:") + 4, linha.length()).startsWith(cpfProcurado)) {
                 // Encontrou o CPF, modifica apenas o NIV
-                String nivAntigo = linha.substring(linha.indexOf("NIV:") + 4, linha.indexOf(",", linha.indexOf("NIV:")));
-                String novaLinha = linha.replaceFirst(nivAntigo, novoNIV);
+                 String nivAntigo = linha.substring(linha.indexOf("NIV:") + 4, linha.indexOf(",", linha.indexOf("NIV:")));
+                String saldoAntigo = linha.substring(linha.indexOf("saldo:") + 6, linha.indexOf("}", linha.indexOf("saldo:")));
+
+                // Constrói a nova linha com os valores atualizados
+                String novaLinha = linha.replaceFirst(nivAntigo, novoNIV)
+                        .replaceFirst(saldoAntigo, String.valueOf(novoSaldo));
+
                 novoConteudo.append(novaLinha).append("\n");
+
             } else {
                 novoConteudo.append(linha).append("\n");
             }
@@ -179,6 +185,21 @@ public class BD {
         } else {
             System.err.println("Falha ao deletar o arquivo original.");
         }
+    }
+
+
+    public static boolean existeNIVNoDB(String arquivo, String niv) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
+            String linha;
+            while ((linha = reader.readLine())!= null) {
+                if (linha.contains("NIV:" + niv)) {
+                    return true; // NIV encontrado
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao ler o arquivo: " + e.getMessage());
+        }
+        return false; // NIV não encontrado
     }
 
 }

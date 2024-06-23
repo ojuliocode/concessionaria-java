@@ -58,7 +58,12 @@ public class Main {
 
             switch (opcao){
                 case 1:
-                    comprarVeiculo(scanner, cliente1, concessionariaDoBraian);
+                    try {
+
+                        comprarVeiculo(scanner, cliente1, concessionariaDoBraian);
+                    } catch (Exception e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case 2:
                     String caminhoArquivo = "src/dbClientes.txt";
@@ -78,7 +83,7 @@ public class Main {
 
     }
 
-    public static void comprarVeiculo(Scanner scanner, Cliente cliente, Concessionaria concessionaria){
+    public static void comprarVeiculo(Scanner scanner, Cliente cliente, Concessionaria concessionaria) throws Exception {
         System.out.println("Você já sabe qual veículo quer comprar? ");
         System.out.println("1: Sim (qual?)");
         System.out.println("2: Não");
@@ -90,7 +95,7 @@ public class Main {
                 int indiceDoVeiculo = scanner.nextInt();
                 try{
                     cliente.comprarVeiculo(indiceDoVeiculo, concessionaria);
-                }catch (SaldoInsuficienteException | VeiculoIndisponivelException | NaoTemCNHException e ){
+                }catch (SaldoInsuficienteException | VeiculoIndisponivelException | NaoTemCNHException | AlguemJaTemEsseCarroException e ){
                     System.out.println(e.getMessage());
                 }
                 break;
