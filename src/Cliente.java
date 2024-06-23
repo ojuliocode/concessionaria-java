@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -44,10 +45,14 @@ public class Cliente {
         this.setNIV(lista.get(indiceDoVeiculo).getNIV());
 
         String dbDeClientes = "src/dbClientes.txt";
-        String dbDeCarros = "src/dbCarros.txt";
 
+        try {
+            BD.modificarNIVPorCPF(dbDeClientes, this.cpf, lista.get(indiceDoVeiculo).getNIV());
+        }catch (IOException e) {
+            System.err.println("Erro ao modificar o NIV: " + e.getMessage());
+        }
 
-        BD.salvarNoBD(dbDeClientes,BD.formatarPraSalvarClienteNoBD(this, lista.get(indiceDoVeiculo).getNIV()));
+        //BD.salvarNoBD(dbDeClientes,BD.formatarPraSalvarClienteNoBD(this, lista.get(indiceDoVeiculo).getNIV()));
         System.out.println("Carro comprado com sucesso! ");
     }
 

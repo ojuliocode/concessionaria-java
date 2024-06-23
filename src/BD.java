@@ -8,29 +8,33 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class BD {
-
     public static void abrirArquivo(String arquivo){
-        FileReader fr;
-        try{
-            fr = new FileReader(arquivo);
+        File file = new File(arquivo);
+        if(!file.exists()){
+            try {
+                file.createNewFile(); // Cria o arquivo se ele não existir
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        try {
+            FileReader fr = new FileReader(arquivo);
         }catch (FileNotFoundException e){
             System.out.println(e.getMessage());
             System.out.println("Criando arquivo do BD (não existe)");
-            File file = new File(arquivo);
-
         }
-
     }
 
     public static void salvarNoBD(String arquivo, String info){
         abrirArquivo(arquivo);
         try {
             Path path = Path.of(arquivo);
-            Files.write(path, info.getBytes(), StandardOpenOption.APPEND);
+            Files.write(path, info.getBytes(), StandardOpenOption.WRITE);
 
         }catch (IOException e){
             System.out.println(e.getMessage());
         }
+
     }
 
     public void alterarNoBD(){
@@ -116,60 +120,65 @@ public class BD {
         return cpfFormatado + niv + nome + carteiraDeMotorista + saldo;
     }
 
+    public static void modificarNIVPorCPF(String caminhoArquivo, String cpfProcurado, String novoNIV) throws IOException {
+        List<String> linhas = lerLinhasDoArquivo(caminhoArquivo);
+        StringBuilder novoConteudo = new StringBuilder();
 
-    public static void lerEAtualizarCliente(String cpfSearch, String newNIV) {
-        String filePath = "src/dbClientes.txt";
-        List<Cliente> clientes = new ArrayList<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String cpf = extrairValor(line, "cpf:");
-                String nome = extrairValor(line, "nome:");
-                boolean carteiraDeMotorista = Boolean.parseBoolean(extrairValor(line, "carteiraDeMotorista:"));
-                String NIV = extrairValor(line, "NIV:");
-                double saldo = Double.parseDouble(extrairValor(line, "saldo:"));
-
-                Cliente cliente = new Cliente(cpf, nome, carteiraDeMotorista, saldo, NIV);
-                clientes.add(cliente);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Search for the CPF in the list
-        boolean found = false;
-        for (Cliente cliente : clientes) {
-            if (cliente.getCpf().equals(cpfSearch)) {
-                // Update the NIV value
-                cliente.setNIV(newNIV);
-                found = true;
-                break;
+        for (String linha : linhas) {
+            if (linha.contains("cpf:") && linha.substring(linha.indexOf("cpf:") + 4, linha.length()).startsWith(cpfProcurado)) {
+                // Encontrou o CPF, modifica apenas o NIV
+                String nivAntigo = linha.substring(linha.indexOf("NIV:") + 4, linha.indexOf(",", linha.indexOf("NIV:")));
+                String novaLinha = linha.replaceFirst(nivAntigo, novoNIV);
+                novoConteudo.append(novaLinha).append("\n");
+            } else {
+                novoConteudo.append(linha).append("\n");
             }
         }
 
-        if (!found) {
-            Cliente newCliente = new Cliente(cpfSearch, null, false, 0.0, newNIV);
-            clientes.add(newCliente);
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (Cliente cliente : clientes) {
-                writer.write(cliente.toString());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        // Salva o novo conteúdo no arquivo
+        try (PrintWriter writer = new PrintWriter(new FileWriter(caminhoArquivo))) {
+            writer.print(novoConteudo.toString());
         }
     }
 
-    private static String extrairValor(String line, String key) {
-        int startIndex = line.indexOf(key) + key.length();
-        int endIndex = line.indexOf(",", startIndex);
-        if (endIndex == -1) {
-            endIndex = line.length() - 1;
+    private static List<String> lerLinhasDoArquivo(String caminhoArquivo) throws IOException {
+        List<String> linhas = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(caminhoArquivo))) {
+            String linha;
+            while ((linha = reader.readLine())!= null) {
+                linhas.add(linha);
+            }
         }
-        return line.substring(startIndex, endIndex).trim();
+        return linhas;
+    }
+
+
+    public static void removerLinhaPorCPF(String caminhoArquivo, String cpfProcurado) throws IOException {
+        List<String> linhas = lerLinhasDoArquivo(caminhoArquivo);
+        List<String> novasLinhas = new ArrayList<>();
+
+        for (String linha : linhas) {
+            if (!linha.contains("cpf:") ||!linha.substring(linha.indexOf("cpf:") + 4, linha.length()).startsWith(cpfProcurado)) {
+                novasLinhas.add(linha);
+            }
+        }
+
+        // Escreve as novas linhas no arquivo temporário
+        try (PrintWriter writer = new PrintWriter(new FileWriter("src/temp.dbClientes.txt"))) {
+            for (String novaLinha : novasLinhas) {
+                writer.println(novaLinha);
+            }
+        }
+
+        // Renomeia o arquivo temporário para o nome original
+        File tempFile = new File("src/temp.dbClientes.txt");
+        File originalFile = new File(caminhoArquivo);
+        if (originalFile.delete()) {
+            tempFile.renameTo(originalFile);
+            System.out.println("Arquivo original substituído com sucesso.");
+        } else {
+            System.err.println("Falha ao deletar o arquivo original.");
+        }
     }
 
 }

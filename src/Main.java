@@ -51,7 +51,8 @@ public class Main {
 
             System.out.println("O que deseja hoje?");
             System.out.println("1: Comprar um veiculo");
-            System.out.println("2: Sair");
+            System.out.println("2: Apagar meu cadastro na loja");
+            System.out.println("3: Sair");
 
             opcao = scanner.nextInt();
 
@@ -59,6 +60,16 @@ public class Main {
                 case 1:
                     comprarVeiculo(scanner, cliente1, concessionariaDoBraian);
                     break;
+                case 2:
+                    String caminhoArquivo = "src/dbClientes.txt";
+                    String cpfProcurado = cliente1.getCpf(); // Exemplo de CPF a ser removido
+
+                    try {
+                        BD.removerLinhaPorCPF(caminhoArquivo, cpfProcurado);
+                        System.out.println("Cadastro removida com sucesso.");
+                    } catch (IOException e) {
+                        System.err.println("Erro ao remover a linha: " + e.getMessage());
+                    }
             }
 
         }
