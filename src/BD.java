@@ -122,6 +122,7 @@ public class BD {
     }
 
     public static void modificarNoDB(String caminhoArquivo, String cpfProcurado, String novoNIV, double novoSaldo) throws IOException {
+        String novoNIVgeral = novoNIV;
         List<String> linhas = lerLinhasDoArquivo(caminhoArquivo);
         StringBuilder novoConteudo = new StringBuilder();
 
@@ -129,11 +130,30 @@ public class BD {
             if (linha.contains("cpf:") && linha.substring(linha.indexOf("cpf:") + 4, linha.length()).startsWith(cpfProcurado)) {
                 // Encontrou o CPF, modifica apenas o NIV
                  String nivAntigo = linha.substring(linha.indexOf("NIV:") + 4, linha.indexOf(",", linha.indexOf("NIV:")));
+                System.out.println("niv antigo");
+                System.out.println(nivAntigo);
+                 if(nivAntigo.equals("null")){
+                     System.out.println(">>");
+                     novoNIVgeral = "[" + novoNIV + "]";
+                 }else{
+                     System.out.println("------");
+                     System.out.println(nivAntigo);
+                     System.out.println(novoNIV);
+                     String modifiedInput = nivAntigo.substring(0, nivAntigo.length() - 1);
+                     modifiedInput += "/" + novoNIV;
+                     modifiedInput += "]";
+                     novoNIVgeral = modifiedInput;
+                     System.out.println("<<");
+                 }
                 String saldoAntigo = linha.substring(linha.indexOf("saldo:") + 6, linha.indexOf("}", linha.indexOf("saldo:")));
 
+                System.out.println("------");
                 // Constrói a nova linha com os valores atualizados
-                String novaLinha = linha.replaceFirst(nivAntigo, novoNIV)
-                        .replaceFirst(saldoAntigo, String.valueOf(novoSaldo));
+                String novaLinha = linha.replace(nivAntigo, novoNIVgeral);
+                System.out.println(novaLinha);
+                novaLinha = novaLinha.replaceFirst(saldoAntigo, String.valueOf(novoSaldo));
+
+                System.out.println(novaLinha);
 
                 novoConteudo.append(novaLinha).append("\n");
 
@@ -226,7 +246,7 @@ public class BD {
         try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
             String linha;
             while ((linha = reader.readLine())!= null) {
-                if (linha.contains("NIV:" + niv)) {
+                if (linha.contains("NIV:[" + niv+"]")) {
                     return true; // NIV encontrado
                 }
             }
