@@ -1,9 +1,9 @@
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +19,8 @@ public class BD {
         }
         try {
             FileReader fr = new FileReader(arquivo);
-        }catch (FileNotFoundException e){
+            fr.close();
+        }catch (IOException e){
             System.out.println(e.getMessage());
             System.out.println("Criando arquivo do BD (não existe)");
         }
@@ -179,13 +180,46 @@ public class BD {
         // Renomeia o arquivo temporário para o nome original
         File tempFile = new File("src/temp.dbClientes.txt");
         File originalFile = new File(caminhoArquivo);
-        if (originalFile.delete()) {
+        if (deleteLatest("src", "dbClientes.txt")) {
             tempFile.renameTo(originalFile);
             System.out.println("Arquivo original substituído com sucesso.");
         } else {
             System.err.println("Falha ao deletar o arquivo original.");
         }
+
+
+
     }
+
+    public static boolean deleteLatest(String directoryPath, String fileName) {
+        try {
+            Path dir = Paths.get(directoryPath);
+            Optional<File[]> optionalFiles = Optional.ofNullable(dir.toFile().listFiles((dir1, name) -> name.equals(fileName)));
+
+            if (optionalFiles.isPresent()) {
+                File[] files = optionalFiles.get();
+                Arrays.sort(files, Comparator.comparingLong(File::lastModified));
+
+                if (files.length > 0) {
+                    Path latestVersion = files[files.length - 1].toPath();
+                    System.out.println("Última versão encontrada: " + latestVersion);
+
+                    // Exclui o arquivo mais recente
+                    Files.deleteIfExists(latestVersion);
+                    System.out.println("Última versão excluída com sucesso.");
+                } else {
+                    System.out.println("Arquivo não encontrado no diretório especificado.");
+                }
+            } else {
+                System.out.println("Diretório vazio ou não encontrado.");
+            }
+            return true;
+        } catch (IOException e) {
+            System.err.println("Erro ao processar o diretório: " + e.getMessage());
+            return false;
+        }
+    }
+
 
 
     public static boolean existeNIVNoDB(String arquivo, String niv) {

@@ -1,1 +1,4 @@
 {cpf:123123,NIV:X9Y8Z7W6V5U4T3S2R1Q,nome:julio,carteiraDeMotorista:true,saldo:981074.0}
+{cpf:123,NIV:null,nome:julio,carteiraDeMotorista:true,saldo:1000000.0}
+{cpf:87654,NIV:null,nome:julio,carteiraDeMotorista:true,saldo:2354.0}
+{cpf:76576,NIV:null,nome:j,carteiraDeMotorista:true,saldo:1231231.0}
